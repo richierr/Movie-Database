@@ -8,8 +8,5 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class RecListener extends RecyclerView.SimpleOnItemTouchListener {
 
-    @Override
-    public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-        super.onTouchEvent(rv, e);
-    }
+
 }
