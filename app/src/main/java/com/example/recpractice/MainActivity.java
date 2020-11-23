@@ -2,57 +2,122 @@ package com.example.recpractice;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.recpractice.adapters.MovieAdapter;
 import com.example.recpractice.model.Movie;
+import com.j256.ormlite.dao.Dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private List<Movie> movieList;
+    //private List<Movie> movieList;
+    private List<Movie> listFromDb;
     private RecyclerView recyclerView;
     private MovieAdapter mAdapter;
     private static final String TAG = "MainActivity";
+    Dao<Movie,Integer> movieDao=null;
+    DatabaseHelper helper=new DatabaseHelper(this);
+    Toolbar myToolbar;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.toolbar,menu);
+
+        return super.onCreateOptionsMenu(menu);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        movieList=new ArrayList<>();
         setContentView(R.layout.activity_main);
+        myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        listFromDb=new ArrayList<>();
+
+
+
+
+
+
+
+
+
+
+        try{
+            movieDao=helper.getMovieDao();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        prepareMovieData();
+        listFromDb=getMovieData();
         recyclerView=findViewById(R.id.rec_view);
-        mAdapter=new MovieAdapter(movieList,getApplicationContext());
+        mAdapter=new MovieAdapter(listFromDb,getApplicationContext(),helper);
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        Log.d(TAG, "onCreate: ");
 
 
 
 
-
+        Log.d(TAG, "onCreate: "+listFromDb.get(0).getTitle());
         recyclerView.setAdapter(mAdapter);
 
 
-        prepareMovieData();
 
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_favorite:
+                Intent intent=new Intent(this,SecondActivity.class);
+                startActivity(intent);
+
+        }
+        return true;
+    }
+
+    private List<Movie> getMovieData(){
+        List<Movie> movies = null;
+        try {
+            movies=movieDao.queryForAll();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        //mAdapter.notifyDataSetChanged();
+        return movies;
+
+
+    }
 
     private void prepareMovieData() {
+        List<Movie> movieList=new ArrayList<>();
         Movie movie = new Movie("Mad Max: Fury Road", "Action & Adventure", "2015",R.drawable.madmax);
+
         movieList.add(movie);
 
         movie = new Movie("Inside Out", "Animation, Kids & Family", "2015",R.drawable.insideout);
@@ -100,6 +165,14 @@ public class MainActivity extends AppCompatActivity {
         movie = new Movie("Guardians of the Galaxy", "Science Fiction & Fantasy", "2014",R.drawable.guardians);
         movieList.add(movie);
 
-        mAdapter.notifyDataSetChanged();
+        for(Movie movieInput:movieList){
+            try {
+                movieDao.create(movieInput);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
+
     }
 }

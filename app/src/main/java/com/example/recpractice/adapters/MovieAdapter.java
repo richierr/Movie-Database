@@ -16,9 +16,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.recpractice.DatabaseHelper;
 import com.example.recpractice.R;
+import com.example.recpractice.model.Favs;
 import com.example.recpractice.model.Movie;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.table.TableUtils;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -26,11 +31,19 @@ import static android.content.ContentValues.TAG;
 public class MovieAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private List<Movie> movieList;
+     Dao<Favs,Integer> favsIntegerDao;
+     DatabaseHelper databaseHelper;
 
-    public MovieAdapter(List<Movie> movieList,Context context)
-    {
+    public MovieAdapter(List<Movie> movieList, Context context, DatabaseHelper databaseHelper)  {
+        this.databaseHelper=databaseHelper;
         this.mContext=context;
         this.movieList = movieList;
+        try {
+            favsIntegerDao = databaseHelper.getFavsDao();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     @NonNull
@@ -56,29 +69,48 @@ public class MovieAdapter extends RecyclerView.Adapter {
         myHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPopUpMenu(myHolder.imageView);
+                showPopUpMenu(myHolder.imageView,movie.getId());
             }
+
+
+
        });
     }
-    private void showPopUpMenu(View view){
-
+    private void showPopUpMenu(View view,int id ){
         PopupMenu popupMenu=new PopupMenu(mContext, view);
         MenuInflater inflater=popupMenu.getMenuInflater();
         inflater.inflate(R.menu.menu_movie,popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new MyMenuItemClickListener());
+        popupMenu.setOnMenuItemClickListener(new MyMenuItemClickListener(id));
         popupMenu.show();
     }
 class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener{
+    int movieId;
+        public MyMenuItemClickListener(int movieId) {
+            this.movieId=movieId;
+    }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
 
         switch (item.getItemId()){
             case R.id.action_add_favourite:
-                Toast.makeText(mContext, "Added to fav", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Added to fav "+movieId, Toast.LENGTH_SHORT).show();
+
+                try {
+                    Favs favs=new Favs(movieId,3.14d);
+                    favsIntegerDao.create(favs);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+
                 return true;
             case R.id.remove:
-                Toast.makeText(mContext, "Removed", Toast.LENGTH_SHORT).show();
+                try {
+                    Toast.makeText(mContext, "Removed "+favsIntegerDao.queryForAll().get(0).getRating(), Toast.LENGTH_SHORT).show();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+
                 return true;
             default:
         }

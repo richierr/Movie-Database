@@ -1,16 +1,41 @@
 package com.example.recpractice.model;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.sql.SQLException;
 
 @DatabaseTable(tableName = Movie.TABLE_NAME)
 public class Movie {
-    private static final String TABLE_NAME ="movies" ;
+    public static final String TABLE_NAME ="movies" ;
 
+public static final String TITLE="title",GENRE="genre",YEAR="year",THUMBNAIL="thumbnail",ID="id";
 
-    private String title,genre,year;
+       // Dao<Movie, Integer> mMovieDao = null;
+
+    @DatabaseField(columnName =TITLE)
+    private String title;
+
+    @DatabaseField(columnName = GENRE)
+    private String genre;
+    @DatabaseField(columnName =YEAR)
+    private String year;
+    @DatabaseField(columnName =THUMBNAIL)
     private int thumbnail;
+    @DatabaseField(columnName =ID,generatedId = true)
+    private int id;
 
+    public Movie() {
+    }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getThumbnail() {
         return thumbnail;
@@ -50,4 +75,7 @@ public class Movie {
         this.year = year;
         this.thumbnail=thumbnail;
     }
+
+
+
 }
