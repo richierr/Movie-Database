@@ -17,31 +17,65 @@ import java.sql.SQLException;
 import static android.content.ContentValues.TAG;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
+
+
+
+    private static DatabaseHelper INSTANCE;
+
+
+
     private static final String DATABASE_NAME="mybase.db";
     private Dao<Movie,Integer> mMovieDao=null;
-    private Dao<Favs,Integer> favsDao=null;
+    private  Dao<Favs,Integer> favsDao=null;
     public static final int DATABASE_VERSION=1;
 
 
     //CONSTRUCTOR
-    public DatabaseHelper(Context context) {
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public static DatabaseHelper getINSTANCE(Context context){
+        if(INSTANCE==null){
+            INSTANCE=new DatabaseHelper(context);
+            return INSTANCE;
+        }else{
+            return INSTANCE;
+        }
+
     }
 
 
     //GIVE FAVS DAO
-    public Dao<Favs,Integer> getFavsDao()throws SQLException{
-        if(favsDao==null){
-            favsDao=getDao(Favs.class);
+    public Dao<Favs,Integer> getFavsDao(){
+        try {
+            return getDao(Favs.class);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-        return favsDao;
+
+
+//        if(favsDao==null){
+//            try {
+//                favsDao=getDao(Favs.class);
+//            } catch (SQLException throwables) {
+//                throwables.printStackTrace();
+//            }
+//        }
+//        return favsDao;
+
+    return null;
     }
 
 
     //GIVE MOVIE DAO
-    public Dao<Movie,Integer> getMovieDao() throws SQLException {
+    public Dao<Movie,Integer> getMovieDao() {
         if(mMovieDao==null){
-            mMovieDao=getDao(Movie.class);
+            try {
+                mMovieDao=getDao(Movie.class);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
         return mMovieDao;
     }

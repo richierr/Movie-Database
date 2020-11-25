@@ -11,5 +11,4 @@
         android:title="Favs"
         android:visible="true"
         app:showAsAction="ifRoom|withText" />
-
 </menu>

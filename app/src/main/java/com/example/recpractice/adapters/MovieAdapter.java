@@ -34,16 +34,12 @@ public class MovieAdapter extends RecyclerView.Adapter {
      Dao<Favs,Integer> favsIntegerDao;
      DatabaseHelper databaseHelper;
 
-    public MovieAdapter(List<Movie> movieList, Context context, DatabaseHelper databaseHelper)  {
-        this.databaseHelper=databaseHelper;
+    public MovieAdapter(List<Movie> movieList, Context context)  {
+        this.databaseHelper=DatabaseHelper.getINSTANCE(context);
         this.mContext=context;
         this.movieList = movieList;
-        try {
-            favsIntegerDao = databaseHelper.getFavsDao();
+        favsIntegerDao = DatabaseHelper.getINSTANCE(context).getFavsDao();
 
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
     }
 
     @NonNull
@@ -136,10 +132,10 @@ class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener{
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            imageView=(ImageView) itemView.findViewById(R.id.mImageView);
-            title=(TextView) itemView.findViewById(R.id.txtVTittle);
-            year=(TextView) itemView.findViewById(R.id.txtGenre);
-            genre=(TextView) itemView.findViewById(R.id.txtYear);
+            imageView= itemView.findViewById(R.id.mImageView);
+            title= itemView.findViewById(R.id.txtVTittle);
+            year= itemView.findViewById(R.id.txtGenre);
+            genre= itemView.findViewById(R.id.txtYear);
 
 //            itemView.setOnClickListener(new View.OnClickListener() {
 //                @Override
