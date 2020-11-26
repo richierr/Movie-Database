@@ -1,7 +1,6 @@
 package com.example.recpractice.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,18 +20,18 @@ import com.example.recpractice.R;
 import com.example.recpractice.model.Favs;
 import com.example.recpractice.model.Movie;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.table.TableUtils;
+import com.j256.ormlite.stmt.DeleteBuilder;
+
 
 import java.sql.SQLException;
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class MovieAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private List<Movie> movieList;
      Dao<Favs,Integer> favsIntegerDao;
      DatabaseHelper databaseHelper;
+     private MovieAdapter movieAdapter = this;
 
     public MovieAdapter(List<Movie> movieList, Context context)  {
         this.databaseHelper=DatabaseHelper.getINSTANCE(context);
@@ -45,7 +44,6 @@ public class MovieAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
 
         View itemView=LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_card, parent, false);
 
@@ -67,11 +65,13 @@ public class MovieAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 showPopUpMenu(myHolder.imageView,movie.getId());
             }
-
-
-
        });
     }
+
+
+
+
+
     private void showPopUpMenu(View view,int id ){
         PopupMenu popupMenu=new PopupMenu(mContext, view);
         MenuInflater inflater=popupMenu.getMenuInflater();
@@ -93,7 +93,9 @@ class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener{
                 Toast.makeText(mContext, "Added to fav "+movieId, Toast.LENGTH_SHORT).show();
 
                 try {
-                    Favs favs=new Favs(movieId,3.14d);
+                    Movie movie =DatabaseHelper.getINSTANCE(mContext).getMovieDao().queryForId(movieId);
+                    Favs favs=new Favs(movieId,3.14d,databaseHelper.getMovieDao().queryForId(movieId));
+
                     favsIntegerDao.create(favs);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
@@ -103,6 +105,14 @@ class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener{
             case R.id.remove:
                 try {
                     Toast.makeText(mContext, "Removed "+favsIntegerDao.queryForAll().get(0).getRating(), Toast.LENGTH_SHORT).show();
+
+                    DeleteBuilder<Favs,Integer> deleteBuilder=favsIntegerDao.deleteBuilder();
+                    deleteBuilder.where().eq("movie_id",movieId);
+                    deleteBuilder.delete();
+                    deleteItemFromTheList(movieId);
+
+                    movieAdapter.notifyDataSetChanged();
+
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -120,7 +130,14 @@ class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener{
     }
 
 
-
+private void deleteItemFromTheList(int position){
+        for(Movie movie:movieList){
+            if(movie.getId()==position){
+                movieList.remove(movie);
+return;
+            }
+        }
+}
 
 
     class MyViewHolder extends RecyclerView.ViewHolder {

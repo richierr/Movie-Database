@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Dao<Movie, Integer> movieDao = null;
     private DatabaseHelper helper;
     private Toolbar myToolbar;
-    private RecViewer recViewer;
+
 
 
     @Override
@@ -50,35 +50,35 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         helper=DatabaseHelper.getINSTANCE(this);
-        myToolbar = findViewById(R.id.toolbar_reusable);
         listFromDb = new ArrayList<>();
-
-
-
         movieDao = helper.getMovieDao();
 
         getMovieData();
 
 
-//        recyclerView = findViewById(R.id.rec_view);
-//        mAdapter = new MovieAdapter(listFromDb, getApplicationContext(), helper);
-//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-//        recyclerView.setLayoutManager(layoutManager);
-//        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-//        recyclerView.setAdapter(mAdapter);
+        setUpRecycleV();
 
-
-        recViewer=RecViewer.getINSTANCE(this,listFromDb);
-        setSupportActionBar(myToolbar);
-//        LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT );
-//        addContentView(recViewer,params);
-
-
-//        Log.d(TAG, "onCreate: " + listFromDb.get(0).getTitle());
-        //addContentView(recyclerView, RecyclerView.LayoutParams);
+        setUpToolbar();
 
     }
+
+    private void setUpToolbar(){
+        myToolbar = findViewById(R.id.toolbar_reusable);
+        setSupportActionBar(myToolbar);
+    }
+
+    private void setUpRecycleV(){
+        recyclerView = findViewById(R.id.rec_view);
+        mAdapter = new MovieAdapter(listFromDb, getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerView.setAdapter(mAdapter);
+    }
+
 
 
 
