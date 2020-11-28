@@ -8,6 +8,7 @@ import java.util.List;
 public class FavsListFragment extends ListFragment {
     @Override
     List<Movie> getListData() {
+        getActivity().setTitle("Favorite movies");
         return DatabaseHelper.getINSTANCE(getContext()).getFavMoviesList();
     }
 }

@@ -9,6 +9,7 @@ import com.example.recpractice.model.Favs;
 import com.example.recpractice.model.Movie;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -30,6 +31,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Favs, Integer> favsDao = null;
     public static final int DATABASE_VERSION = 1;
 
+    //Get the main list of movies
     public List<Movie> getMovieList() {
         List<Movie> movieList = null;
         try {
@@ -40,6 +42,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return movieList;
     }
 
+    //Get list of favs
     private List<Favs> getFavsList() {
         List<Favs> favsList = null;
         try {
@@ -50,9 +53,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return favsList;
     }
 
+    //Get list of fav MOVIES
     public List<Movie> getFavMoviesList() {
 
-        List<Movie> favMovieList=null;
+        List<Movie> favMovieList = null;
 
         QueryBuilder<Movie, Integer> movieQueryBuilder = getMovieDao().queryBuilder();
         QueryBuilder<Favs, Integer> favsIntegerQueryBuilder = getFavsDao().queryBuilder();
@@ -65,17 +69,44 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
 
+    //Remove from favs list
+    public void removeFromFavsList(int movieId) {
+        try {
+            DeleteBuilder<Favs, Integer> deleteBuilder = favsDao.deleteBuilder();
+            deleteBuilder.where().eq("movie_id", movieId);
+            deleteBuilder.delete();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+
+    //Add to favs list
+    public void addToFavsList(int movieId) {
+        try {
+
+            Favs favs = new Favs(movieId, 3.14d, getMovieDao().queryForId(movieId));
+            favsDao.create(favs);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
 
     //CONSTRUCTOR
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        favsDao = getFavsDao();
+        mMovieDao = getMovieDao();
     }
 
-    public static DatabaseHelper getINSTANCE(Context context){
-        if(INSTANCE==null){
-            INSTANCE=new DatabaseHelper(context);
+    //Get instance
+    public static DatabaseHelper getINSTANCE(Context context) {
+        if (INSTANCE == null) {
+            INSTANCE = new DatabaseHelper(context);
             return INSTANCE;
-        }else{
+        } else {
             return INSTANCE;
         }
 
@@ -83,7 +114,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 
     //GIVE FAVS DAO
-    public Dao<Favs,Integer> getFavsDao(){
+    private Dao<Favs, Integer> getFavsDao() {
         try {
             return getDao(Favs.class);
         } catch (SQLException throwables) {
@@ -91,15 +122,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
 
-    return null;
+        return null;
     }
 
 
     //GIVE MOVIE DAO
-    public Dao<Movie,Integer> getMovieDao() {
-        if(mMovieDao==null){
+    public Dao<Movie, Integer> getMovieDao() {
+        if (mMovieDao == null) {
             try {
-                mMovieDao=getDao(Movie.class);
+                mMovieDao = getDao(Movie.class);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -111,20 +142,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     //ON CREATE
     @Override
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
-        try{
-            int res1= TableUtils.createTable(connectionSource,Movie.class);
-            Log.d(TAG, "napravio tabelu movies "+res1);
+        try {
+            int res1 = TableUtils.createTable(connectionSource, Movie.class);
+            Log.d(TAG, "napravio tabelu movies " + res1);
 
-            int res=TableUtils.createTable(connectionSource,Favs.class);
-            Log.d(TAG, "napravio tabelu favs "+res);
+            int res = TableUtils.createTable(connectionSource, Favs.class);
+            Log.d(TAG, "napravio tabelu favs " + res);
 
             populateBase();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
     }
 
+    //Populate base
     private void populateBase() {
         List<Movie> movieList = new ArrayList<>();
         Movie movie = new Movie("Mad Max: Fury Road", "Action & Adventure", "2015", R.drawable.madmax);
@@ -190,23 +222,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     //upgrade
     @Override
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
-        try{
-            TableUtils.dropTable(connectionSource,Movie.class,true);
-            TableUtils.dropTable(connectionSource,Favs.class,true);
-            onCreate(database,connectionSource);
-        }catch (SQLException e){
-            throw  new RuntimeException(e);
+        try {
+            TableUtils.dropTable(connectionSource, Movie.class, true);
+            TableUtils.dropTable(connectionSource, Favs.class, true);
+            onCreate(database, connectionSource);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }
 
 
-
-//CLOSE
+    //CLOSE
     @Override
     public void close() {
-        favsDao=null;
-        mMovieDao=null;
+        favsDao = null;
+        mMovieDao = null;
         super.close();
     }
 }

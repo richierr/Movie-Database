@@ -21,6 +21,7 @@ import java.util.List;
 
 public abstract class ListFragment extends Fragment {
 
+    boolean isMainList;
 
 
     @Nullable
@@ -31,7 +32,15 @@ public abstract class ListFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_list,container,false);
 
         RecyclerView recyclerView=view.findViewById(R.id.listRecyclerView);
-        ListAdapter listAdapter=new ListAdapter(getListData(), mListener);
+
+        if(this instanceof MainMoviesListFragment){
+        isMainList=true;
+        }else{
+            isMainList=false;
+        }
+
+
+        ListAdapter listAdapter=new ListAdapter(getListData(), mListener,isMainList);
         recyclerView.setAdapter(listAdapter);
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
         recyclerView.addItemDecoration(new DividerItemDecoration(container.getContext(), LinearLayoutManager.VERTICAL));

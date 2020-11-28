@@ -15,37 +15,53 @@
         tools:srcCompat="@tools:sample/avatars" />
 
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
-        android:orientation="vertical">
+        android:layout_weight="3">
 
         <TextView
             android:id="@+id/itemTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:layout_weight="3"
+            android:layout_marginTop="12dp"
             android:text="TextView"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/addToFavsBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread_inside" />
 
         <TextView
             android:id="@+id/itemGenre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:layout_weight="3"
             android:text="TextView"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemTitle" />
 
         <TextView
             android:id="@+id/itemYear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:layout_weight="3"
             android:text="TextView"
-            android:textSize="12sp" />
-    </LinearLayout>
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemGenre" />
+
+        <Button
+            android:id="@+id/addToFavsBtn"
+            android:layout_width="51dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/favs_icon_foreground"
+            android:clickable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>
