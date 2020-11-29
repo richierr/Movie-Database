@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -45,6 +46,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+        SharedPreferences sharedPreferences=getSharedPreferences("com.example.recpractice_preferences",MODE_PRIVATE);
+        boolean showSplash=sharedPreferences.getBoolean("show_splash",true);
+        Toast.makeText(this, " Show splash "+showSplash, Toast.LENGTH_SHORT).show();
+        if(showSplash){
+
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -57,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction.setReorderingAllowed(true);
             fragmentTransaction.add(R.id.placeholder, listFragment);
             fragmentTransaction.commit();
-            Toast.makeText(this, "SAVED INSTANCE NOT NULL", Toast.LENGTH_SHORT).show();
+
         }
 //        setUpToolbar();
 
@@ -121,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragmentTransaction.commit();
                 item.setChecked(true);
                 mDrawerLayout.closeDrawers();
+
                 break;
 
 
