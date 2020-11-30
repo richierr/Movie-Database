@@ -33,6 +33,7 @@ public abstract class ListFragment extends Fragment {
 
         RecyclerView recyclerView=view.findViewById(R.id.listRecyclerView);
 
+        recyclerView.setHasFixedSize(true);
         if(this instanceof MainMoviesListFragment){
         isMainList=true;
         }else{

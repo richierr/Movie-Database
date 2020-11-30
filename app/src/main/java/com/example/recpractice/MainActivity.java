@@ -5,6 +5,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -12,10 +14,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -41,6 +47,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnMovieItemClickInteface {
 
+    private static final String CHANNEL_ID ="my_channel" ;
     private Toolbar myToolbar;
     private DrawerLayout mDrawerLayout;
     private NavigationView navigationView;
@@ -59,15 +66,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             setContentView(R.layout.activity_splash_activity);
             new Handler().postDelayed(() -> {
                 setContentView(R.layout.activity_main);
-                navigateToScreen(AppConstants.SCREEN_MAIN);
                 setUpDrawer();
+                navigateToScreen(AppConstants.SCREEN_MAIN);
             }, (splash_length*1000));
         }else{
 
 
             setContentView(R.layout.activity_main);
-            navigateToScreen(AppConstants.SCREEN_MAIN);
             setUpDrawer();
+            navigateToScreen(AppConstants.SCREEN_MAIN);
         }
 
 
@@ -86,6 +93,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 //        }
 //        setUpDrawer();
+    }
+
+    private NotificationCompat.Builder addNotifications(){
+        createNotificationChannel();
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon_background)
+                .setContentTitle("My notification")
+                .setContentText("Much longer text that cannot fit one line...")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT).setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        return builder;
+    }
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void setUpDrawer() {
@@ -184,6 +225,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (screenFavMovies) {
             case AppConstants.SCREEN_FAV_MOVIES:
                 fragment = new FavsListFragment();
+                NotificationCompat.Builder builder=addNotifications();
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+                int notificationId=1232;
+                notificationManager.notify(notificationId, builder.build());
                 break;
             case AppConstants.SCREEN_SETTINGS:
                 fragment = new SettingsFragment();
